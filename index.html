@@ -1,0 +1,104 @@
+<!doctype html> 
+<html lang="en"> 
+<head> 
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta http-equiv="Content-Security-Policy" content="default-src * data: gap: https://ssl.gstatic.com 'unsafe-eval' 'unsafe-inline'; style-src * 'unsafe-inline'; media-src *; img-src * data: content: blob:;">
+    <meta name="format-detection" content="telephone=no">
+    <meta name="msapplication-tap-highlight" content="no">
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width">
+
+    <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+    <title>Phaser 3 Test (倉庫番)</title>
+    <script src="//cdn.jsdelivr.net/npm/phaser@3.11.0/dist/phaser.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/js-cookie@2/src/js.cookie.min.js"></script>
+
+    <script src="js/methods_utils.js"></script>
+    <script src="js/vue_utils.js"></script>
+    <script src="https://unpkg.com/vue"></script>
+</head>
+<body>
+    <div id="top" class="container-fluid">
+        <br>
+        <div id="phaser_canvas"></div>
+        <div id="block_map" v-if="game_state==0">
+            <h2>ブロックを置いてください。</h2>
+            <p>
+                置き終わったら「Game Initialize」ボタンを押してください。
+            </p>
+            <div class="form-inline">
+                ブロック：
+                <select class="form-control" v-model="block_selecting_item">
+                    <option v-bind:value="index" v-for="(block, index) in block_info_list">{{block.title}}</option>
+                </select>
+                &nbsp;プレイヤの初期角度：
+                <select class="form-control" v-model="player_angle" >
+                    <option value="0" selected>0°</option>
+                    <option value="90">90°</option>
+                    <option value="180">180°</option>
+                    <option value="270">270°</option>
+                </select>
+            </div>
+            <button class="btn btn-default" v-on:click="cookie_reload()">リロード</button>
+            <button class="btn btn-default" v-on:click="map_dialog()">JSON</button>
+            <button class="btn btn-default" v-on:click="map_list_reset()">リセット</button>
+            <table class="table table-striped">
+                <tbody>
+                    <tr v-for="(rows, index_row) in block_map">
+                        <td v-for="(column, index_column) in rows">
+                            <img v-bind:src="block_info_list[column].image" width="50" v-on:click="block_select(index_column, index_row)">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="btn btn-default" v-on:click="game_init()" v-if="game_state==0">始める</button>
+        </div>
+        <hr>
+        <div v-if="game_state==1">
+            <h2>残りの鍵の数：{{state.num_keys}}個</h2>
+        </div>
+
+        <div class="modal fade" id="map-dialog">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <textarea class="form-control" rows="10" v-model="map_json"></textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-default" v-on:click="json_load()">ロード</button>
+                        <button class="btn btn-default" v-on:click="dialog_close('#map-dialog')">キャンセル</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="result-dialog">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <h2>{{result_message}}</h2>
+                        <p>
+                            {{result_reason}}
+                        </p>
+                        <img v-bind:src="result_image" class="center-block">
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    </div>
+
+    <script src="js/data.js"></script>
+    <script src="js/index.js"></script>
+    <script src="js/start.js"></script>
+</body>
+</html>
