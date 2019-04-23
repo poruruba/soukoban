@@ -5,8 +5,6 @@ var vue_options = {
     data: {
         progress_title: '',
 
-        card_info_list: card_info_list,
-        card_list: [],
         block_map: [],
         block_selecting_item: 0,
         player_angle: 0,
@@ -84,11 +82,14 @@ var vue_options = {
             config.div = 'phaser_canvas';  //id=phaser_canvasのところにゲーム盤を表示します。
             this.game_state = 1;
             game_initialize(config);
+
+            // 移動のたびに呼び出されるコールバック関数を登録
             player_set_callback(this.callback);
         },
-        callback: async function(state){
+        callback: function(state){
             this.state = state;
 
+            // ゴールにたどり着いたか、失敗したかを判別
             if( state.type == 'goal' && state.num_keys == 0 ){
                 game_over();
 

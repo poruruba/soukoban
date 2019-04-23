@@ -110,7 +110,7 @@ function create (){
                         object: block
                     };
                     break;
-                    case 'puddle':
+                case 'puddle':
                     var block = blocks_jumpable.create(index2pos(i), index2pos(j), 'block_' + g_map[j][i]).setScale(SPRITE_SIZE/BLOCK_SIZE);
                     g_map[j][i] = {
                         type: g_map[j][i],
@@ -145,6 +145,7 @@ function create (){
         duration: 1,
     });
 
+    // カーソル入力の設定
     cursors = this.input.keyboard.createCursorKeys();
 
     // 衝突検知の登録
@@ -182,7 +183,7 @@ function game_over(){
     gameEnd = true;
 }
 
-// フロントエンドからのプレイヤ移動要求
+// フロントエンドへのコールバック登録
 function player_set_callback(callback){
     g_callback = callback;
 }
@@ -193,6 +194,8 @@ function g_callback_player_move_complete(){
         // プレイヤの色を変えます
         player.setTint(0xff0000);
     }
+
+    // 鍵の場所に着いたら、残り鍵数をデクリメントして、鍵を消します。
     if( g_map[g_player.y][g_player.x] != null && g_map[g_player.y][g_player.x].type == 'key' ){
         g_num_keys--;
         g_map[g_player.y][g_player.x].object.disableBody(true, true);
@@ -201,6 +204,8 @@ function g_callback_player_move_complete(){
     
     g_request = Request.IDLE;
     g_state = State.IDLE;
+
+    // コールバックを呼び出します。
     if( g_callback != null ){
         g_callback({
             x: g_player.x,
@@ -259,11 +264,15 @@ function update (){
     }
 
     if( g_state == State.IDLE ){
+        // キー入力のチェック
         if (cursors.up.isDown ){
             if( cursors.shift.isDown)
                 g_request = Request.JUMP;
             else
                 g_request = Request.GO;
+        }else
+        if(cursors.space.isDown){
+            g_request = Request.LASER;
         }else
         if (cursors.right.isDown){
             g_request = Request.TURN_RIGHT;
@@ -392,10 +401,12 @@ function hitBomb (player, bomb){
 // 衝突検知(水たまり)
 function hitJumpable (player, bomb){
     console.log('hitJumpable')
+
     // ジャンプ中だったら衝突しない
     if( g_request == Request.JUMP )
         return;
 
+    // 移動完了後に鍵を消すので、移動中は何もしない
     if( g_map[g_player.y][g_player.x].type == 'key' )
         return;
         
