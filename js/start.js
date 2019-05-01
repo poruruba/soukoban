@@ -6,7 +6,7 @@ var vue_options = {
         progress_title: '',
 
         block_map: [],
-        block_selecting_item: 0,
+        block_selecting_item: 1,
         player_angle: 0,
         block_info_list: block_info_list,
         game_state: 0,
